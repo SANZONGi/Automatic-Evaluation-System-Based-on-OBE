@@ -1,4 +1,4 @@
-package com.sanzongi.obe;
+package com.sanzong.obe;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
