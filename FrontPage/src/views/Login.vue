@@ -6,14 +6,11 @@
     <el-main>
       <div class="form">
         <div style="background-color: #4d5cff; height: 15%;top:-5%; position: relative">
-          <el-button type="text" icon="el-icon-arrow-left" style="color: black;font-size: 20px;float: left"
-                     @click="back">返回
-          </el-button>
-          <h2 style="position:relative;margin-right:40px;top: 10px">登录</h2>
+          <h2 style="position:relative;align-content: center;top: 10px">登录</h2>
         </div>
         <el-form :model="form" status-icon ref="form" label-width="20px">
           <el-form-item class="item" prop="username">
-            <el-input prefix-icon="el-icon-user-solid" v-model="form.username" style="width: 250px"
+            <el-input prefix-icon="el-icon-user-solid" v-model="form.account" style="width: 250px"
                       placeholder="请输入用户名"></el-input>
           </el-form-item>
           <el-form-item class="item" prop="pwd">
@@ -40,54 +37,51 @@ export default {
       input4: '',
       circleUrl: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
       form: {
-        username: '',
+        account: '',
         pwd: ''
       },
     };
   },
   methods: {
-    back() {
-      this.$router.push("Home")
-    },
-    handleClick(tab, event) {
-      if (this.activeName === 'first') this.$router.push("Home")
-      console.log(tab, event);
-    },
     onSubmit() {
       this.$axios({
         method: 'post',
-        url: '/v2.0/users/check',
+        url: '/obe/user/verify',
         data: this.form
-      }).then((res) => {//登录失败
-        if (res.data.code !== 200) {
+      }).then((res) => {
+        console.log(this.form)
+        //登录失败
+        if (res.data.status !== 'success') {
           alert(res.data.msg)
-        } else {//登录成功
-          this.$store.commit("SET_TOKEN", res.data.msg)//改变SET_TOKEN中的值，用res.data.msg传回store.js中代替原本store中的token值
-          this.$store.commit("SET_USERINF", res.data.data)
-          this.$axios({
-            method: "get",
-            url: "/v2.0/role/" + this.$store.getters.getUser.uid
-          }).then(res => {
-            if (res.data.data.role === 0) {//返回的role值是1说明应该进入卖家页面
-              this.$message({
-                type: "success",
-                message: "尊敬的管理员,登陆成功"
-              })
-              console.log(res.data.data)
-              localStorage.setItem("uid", res.data.data.uid)
-              localStorage.setItem("role", res.data.data.role)
-              this.$router.push("Userhome")
-            } else if (res.data.data.role === 1) {//普通用户
-              this.$message({
-                type: "success",
-                message: "登陆成功"
-              })
-              localStorage.setItem("uid", res.data.data.uid)
-              localStorage.setItem("role", res.data.data.role)
-              console.log(res.data.data)
-              this.$router.push("Custhistory")
-            }
-          })
+        } else {
+          //登录成功
+          this.$router.push("Home")
+          // this.$store.commit("SET_TOKEN", res.data.msg)//改变SET_TOKEN中的值，用res.data.msg传回store.js中代替原本store中的token值
+          // this.$store.commit("SET_USERINF", res.data.data)
+          // this.$axios({
+          //   method: "get",
+          //   url: "/v2.0/role/" + this.$store.getters.getUser.uid
+          // }).then(res => {
+          //   if (res.data.data.role === 0) {//返回的role值是1说明应该进入卖家页面
+          //     this.$message({
+          //       type: "success",
+          //       message: "尊敬的管理员,登陆成功"
+          //     })
+          //     console.log(res.data.data)
+          //     localStorage.setItem("uid", res.data.data.uid)
+          //     localStorage.setItem("role", res.data.data.role)
+          //     this.$router.push("Userhome")
+          //   } else if (res.data.data.role === 1) {//普通用户
+          //     this.$message({
+          //       type: "success",
+          //       message: "登陆成功"
+          //     })
+          //     localStorage.setItem("uid", res.data.data.uid)
+          //     localStorage.setItem("role", res.data.data.role)
+          //     console.log(res.data.data)
+          //     this.$router.push("Custhistory")
+          //   }
+          // })
         }
       })
     },

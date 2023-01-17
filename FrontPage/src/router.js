@@ -4,7 +4,9 @@ import Meta from 'vue-meta'
 
 Vue.use(VueRouter)
 Vue.use(Meta)
+
 const Login = () => import('./views/Login')
+const Home = () => import('./views/Home')
 export default new VueRouter({
     routes: [
         {
@@ -18,6 +20,11 @@ export default new VueRouter({
             meta: {
                 requireAuth: false
             }
+        },
+        {
+            path: '/Home',
+            name: 'Home',
+            component: Home
         }
     ]
 })

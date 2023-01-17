@@ -20,6 +20,13 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class User  {
 
+
+    public User(String account, String passwd, String salt) {
+        this.account = account;
+        this.passwd = passwd;
+        this.salt = salt;
+    }
+
     private static final long serialVersionUID = 1L;
 
     @TableId(type = IdType.AUTO)
@@ -50,5 +57,8 @@ public class User  {
      */
     private String phone;
 
-
+    /**
+     * 盐
+     */
+    private String salt;
 }
