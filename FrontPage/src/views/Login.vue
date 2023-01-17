@@ -5,7 +5,7 @@
     </el-header>
     <el-main>
       <div class="form">
-        <div style="background-color: #4d5cff; height: 15%;top:-5%; position: relative">
+        <div style="background-color: #17233d; height: 15%;top:-5%; position: relative">
           <h2 style="position:relative;align-content: center;top: 10px">登录</h2>
         </div>
         <el-form :model="form" status-icon ref="form" label-width="20px">
