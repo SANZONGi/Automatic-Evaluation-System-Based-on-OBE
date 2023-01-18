@@ -47,6 +47,13 @@
             </Submenu>
           </Menu>
         </Sider>
+          <Layout :style="{padding: '14px 24px 24px'}">
+            <Content :style="{padding: '24px', minHeight: '280px', background: '#fff'}">
+              个人信息管理
+
+
+            </Content>
+          </Layout>
       </Layout>
     </Layout>
   </div>

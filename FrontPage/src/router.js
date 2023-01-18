@@ -7,6 +7,7 @@ Vue.use(Meta)
 
 const Login = () => import('./views/Login')
 const Home = () => import('./views/Home')
+const UserInf = () => import('./views/UserInf')
 export default new VueRouter({
     routes: [
         {
@@ -25,6 +26,11 @@ export default new VueRouter({
             path: '/Home',
             name: 'Home',
             component: Home
+        },
+        {
+            path: '/UserInf',
+            name: 'UserInf',
+            component: UserInf
         }
     ]
 })
