@@ -1,5 +1,5 @@
 <template>
-  <Menu active-name="1-2" theme="light" width="auto" :open-names="['1']">
+  <Menu theme="light" width="auto" :open-names="[1]">
     <Submenu name="1">
       <template #title>
         <Icon type="ios-navigate"></Icon>
@@ -18,8 +18,12 @@
         <Icon type="ios-keypad"></Icon>
         毕业要求
       </template>
-      <MenuItem name="2-1">毕业要求管理</MenuItem>
-      <MenuItem name="2-2">毕业要求细分点管理</MenuItem>
+      <router-link to="GradReqment">
+        <MenuItem name="2-1">毕业要求管理</MenuItem>
+      </router-link>
+      <router-link to="Subdivision">
+        <MenuItem name="2-2">毕业要求细分点管理</MenuItem>
+      </router-link>
       <MenuItem name="2-3">毕业要求-培养目标矩阵</MenuItem>
     </Submenu>
     <Submenu name="3">

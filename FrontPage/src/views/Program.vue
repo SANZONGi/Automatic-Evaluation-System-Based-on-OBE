@@ -44,7 +44,9 @@
 
               <el-table
                   :data="tableData"
-                  style="width: 100%;">
+                  max-height="550px"
+                  style="width: 100%;"
+                  accordion>
                 <el-table-column type="expand">
                   <template slot-scope="props">
                     <el-form label-position="left" inline class="demo-table-expand">
@@ -60,11 +62,11 @@
                       <el-form-item label="描述">
                         <span>{{ props.row.content }}</span>
                       </el-form-item>
-                      <el-row>
+                      <el-row type="flex" justify="center" align="middle">
                         <router-link :to="{path: '/ProgramEdit', query: {id:props.row.id}}">
                           <el-button type="primary" icon="el-icon-edit"  circle></el-button>
                         </router-link>
-
+                        <div style="width: 120px;"></div>
                         <el-button type="danger" icon="el-icon-delete" @click="Delete(props.row.id)" circle></el-button>
                       </el-row>
                     </el-form>
