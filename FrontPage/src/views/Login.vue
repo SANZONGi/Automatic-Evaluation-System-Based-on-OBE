@@ -49,7 +49,7 @@ export default {
         url: '/obe/user/verify',
         data: this.form
       }).then((res) => {
-        console.log(this.form)
+        // console.log(this.form)
         //登录失败
         if (res.data.status !== 'success') {
           alert(res.data.msg)
