@@ -16,6 +16,9 @@ const GradReqmentEdit = () => import('./views/GradReqmentEdit')
 const GradReqment = () => import('./views/GradReqment')
 const Subdivision = () => import('./views/Subdivision')
 const SubdivisionEdit = () => import('./views/SubdivisionEdit')
+const CurriculumList = () => import('./views/CurriculumList')
+const CurriculumListEdit = () => import('./views/CurriculumListEdit')
+const Curriculum = () => import('./views/Curriculum')
 
 
 
@@ -82,6 +85,21 @@ export default new VueRouter({
             path: '/SubdivisionEdit',
             name: 'SubdivisionEdit',
             component: SubdivisionEdit
+        },
+        {
+            path: '/CurriculumList',
+            name: 'CurriculumList',
+            component: CurriculumList
+        },
+        {
+            path: '/CurriculumListEdit',
+            name: 'CurriculumListEdit',
+            component: CurriculumListEdit
+        },
+        {
+            path: '/Curriculum',
+            name: 'Curriculum',
+            component: Curriculum
         }
     ]
 })

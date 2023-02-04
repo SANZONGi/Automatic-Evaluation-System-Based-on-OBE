@@ -31,7 +31,9 @@
         <Icon type="ios-analytics"></Icon>
         课程体系
       </template>
-      <MenuItem name="3-1">课程体系管理</MenuItem>
+      <router-link to="CurriculumList">
+        <MenuItem name="3-1">课程体系管理</MenuItem>
+      </router-link>
     </Submenu>
     <Submenu name="4">
       <template #title>
