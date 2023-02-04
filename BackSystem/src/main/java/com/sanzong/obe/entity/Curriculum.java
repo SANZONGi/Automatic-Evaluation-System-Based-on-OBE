@@ -2,6 +2,7 @@ package com.sanzong.obe.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -16,6 +17,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
+@AllArgsConstructor
 public class Curriculum  {
 
     private static final long serialVersionUID = 1L;
@@ -48,5 +50,10 @@ public class Curriculum  {
      */
     private String criterion;
 
-
+    public Curriculum(Integer id, String name, String teacher, String open) {
+        this.id = id;
+        this.name = name;
+        this.teacher = teacher;
+        this.open = open;
+    }
 }

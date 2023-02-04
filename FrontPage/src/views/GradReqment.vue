@@ -16,7 +16,8 @@
   width: 90px;
   color: #99a9bf;
 }
-.demo-table-expand .el-form-item {
+.demo-table-expand
+.el-form-item {
   margin-right: 0;
   margin-bottom: 0;
   width: 50%;
@@ -33,34 +34,33 @@
           <MySider/>
         </Sider>
         <Layout :style="{padding: '14px 24px'}">
-
-          <Content v-if="show" :style="{padding: '24px', minHeight: '280px', background: '#fff' }">
+          <Content :style="{padding: '24px', minHeight: '280px', background: '#fff'}">
             <el-row>
-              <span>培养目标管理</span>
-              <router-link to="TrainingObjsEdit">
-                <el-button style="float: right">新增目标</el-button>
+              <span>毕业要求管理</span>
+              <router-link to="GradReqmentEdit">
+                <el-button style="float: right">新增要求</el-button>
               </router-link>
+
             </el-row>
 
             <el-table
                 :data="tableData"
                 max-height="550px"
-                style="width: 100%;"
-                accordion>
-              <el-table-column type="expand">
+                style="width: 100%;">
+              <el-table-column type="expand" >
                 <template slot-scope="props">
                   <el-form label-position="left" inline class="demo-table-expand">
-                    <el-form-item label="培养目标 ID">
+                    <el-form-item label="毕业要求 ID">
                       <span>{{ props.row.id }}</span>
                     </el-form-item>
-                    <el-form-item label="培养目标" label-width="100px">
-                      <span>{{ props.row.objective }}</span>
+                    <el-form-item label="毕业要求" label-width="100px">
+                      <span>{{ props.row.graduationRequirement }}</span>
                     </el-form-item>
                     <el-form-item label="描述">
                       <span>{{ props.row.content }}</span>
                     </el-form-item>
                     <el-row type="flex" justify="center" align="middle">
-                      <router-link :to="{path: '/TrainingObjsEdit', query: {id:props.row.id}}">
+                      <router-link :to="{path: '/GradReqmentEdit', query: {id:props.row.id}}">
                         <el-button type="primary" icon="el-icon-edit"  circle></el-button>
                       </router-link>
                       <div style="width: 120px;"></div>
@@ -70,25 +70,25 @@
                 </template>
               </el-table-column>
               <el-table-column
-                  label="培养目标ID"
-                  prop="id">
-              </el-table-column>
-              <el-table-column
-                  label="培养目标"
-                  prop="objective">
+                  label="毕业要求"
+                  prop="graduationRequirement">
               </el-table-column>
               <el-table-column
                   label="描述"
                   prop="content"
                   :show-overflow-tooltip="true">
               </el-table-column>
+              <el-table-column
+                  fixed="right"
+                  label="细分点操作"
+                  width="100">
+                <template slot-scope="scope">
+                  <el-button @click="SearchDiv(scope.row.id)" type="text" size="small">查看</el-button>
+                  <el-button @click="AddDiv(scope.row.id)" type="text" size="small">新增 </el-button>
+                </template>
+              </el-table-column>
+
             </el-table>
-          </Content>
-          <Content v-if="!show" :style="{padding: '24px', minHeight: '280px', background: '#fff' }">
-            <el-row>
-              <span>培养目标管理</span>
-            </el-row>
-            <h1 >请选择培养方案</h1>
           </Content>
         </Layout>
       </Layout>
@@ -105,18 +105,15 @@ export default {
   components: {MyHeader, MySider},
   data() {
     return {
-      show: false,
       tableData: [{
         id: '',
-        objective: '',
+        graduationRequirement: '',
         content: '',
-        fid: ''
       }]
     }
   },
   created() {
-    this.show = localStorage.getItem("program") !== null;
-    this.$axios.get("/obe/objective/list/" + JSON.parse(localStorage.getItem("program")).id).then(res=>{
+    this.$axios.get("/obe/gradreqs/list").then(res=>{
       if(res.data.status === "success") {
         this.tableData = res.data.data;
       } else {
@@ -125,13 +122,17 @@ export default {
     })
   },methods: {
     Delete(id) {
-      this.$axios.delete("/obe/objective/delete/" + id).then(res => {
+      this.$axios.delete("/obe/gradreqs/delete/" + id).then(res => {
         if(res.data.status === "success") {
           this.reload();
         } else {
           alert("error");
         }
       })
+    },SearchDiv(id) {
+      this.$router.push({path: '/Subdivision', query: {id:id}})
+    },AddDiv(id) {
+      this.$router.push({path: '/SubdivisionEdit', query: {id:id}})
     }
   }
 }

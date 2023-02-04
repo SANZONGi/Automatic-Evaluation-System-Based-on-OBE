@@ -12,6 +12,16 @@ const Program = () => import('./views/Program')
 const ProgramEdit = () => import('./views/ProgramEdit')
 const TrainingObjs = () => import('./views/TrainingObjs')
 const TrainingObjsEdit = () => import('./views/TrainingObjsEdit')
+const GradReqmentEdit = () => import('./views/GradReqmentEdit')
+const GradReqment = () => import('./views/GradReqment')
+const Subdivision = () => import('./views/Subdivision')
+const SubdivisionEdit = () => import('./views/SubdivisionEdit')
+const CurriculumList = () => import('./views/CurriculumList')
+const CurriculumListEdit = () => import('./views/CurriculumListEdit')
+const Curriculum = () => import('./views/Curriculum')
+
+
+
 export default new VueRouter({
     routes: [
         {
@@ -55,6 +65,41 @@ export default new VueRouter({
             path: '/TrainingObjsEdit',
             name: 'TrainingObjsEdit',
             component: TrainingObjsEdit
+        },
+        {
+            path: '/GradReqment',
+            name: 'GradReqment',
+            component: GradReqment
+        },
+        {
+            path: '/GradReqmentEdit',
+            name: 'GradReqmentEdit',
+            component: GradReqmentEdit
+        },
+        {
+            path: '/Subdivision',
+            name: 'Subdivision',
+            component: Subdivision
+        },
+        {
+            path: '/SubdivisionEdit',
+            name: 'SubdivisionEdit',
+            component: SubdivisionEdit
+        },
+        {
+            path: '/CurriculumList',
+            name: 'CurriculumList',
+            component: CurriculumList
+        },
+        {
+            path: '/CurriculumListEdit',
+            name: 'CurriculumListEdit',
+            component: CurriculumListEdit
+        },
+        {
+            path: '/Curriculum',
+            name: 'Curriculum',
+            component: Curriculum
         }
     ]
 })

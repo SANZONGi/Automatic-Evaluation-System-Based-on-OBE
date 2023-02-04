@@ -11,8 +11,8 @@ import VueQuillEditor from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
-import iView from 'iview'
-import 'iview/dist/styles/iview.css'
+import iView from 'view-design'
+import 'view-design/dist/styles/iview.css'
 Vue.use(VueQuillEditor)
 Vue.use(iView);
 
