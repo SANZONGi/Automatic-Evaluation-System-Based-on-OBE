@@ -27,5 +27,7 @@ public class CurriculumObj  {
 
     private String curriculumObj;
 
+    private String description;
+
 
 }

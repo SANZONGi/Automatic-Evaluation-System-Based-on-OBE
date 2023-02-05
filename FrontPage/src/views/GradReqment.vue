@@ -87,7 +87,6 @@
                   <el-button @click="AddDiv(scope.row.id)" type="text" size="small">新增 </el-button>
                 </template>
               </el-table-column>
-
             </el-table>
           </Content>
         </Layout>

@@ -14,13 +14,6 @@
   width: 90px;
   color: #99a9bf;
 }
-
-.demo-table-expand
-.el-form-item {
-  margin-right: 0;
-  margin-bottom: 0;
-  width: 50%;
-}
 </style>
 
 
@@ -40,17 +33,39 @@
 
             <template>
               <Tabs type="card" style="margin-top: 20px">
-
                 <TabPane label="课程大纲">
 <!--                  v-model禁止使用this-->
-                  <Input v-model="originCurriculum.outline" type="textarea" :autosize="{minRows: 2}"
+                  <Input v-model="originCurriculum.outline" type="textarea" :autosize="{minRows: 4}"
                          placeholder="Enter something..." :disabled="!editable"/>
                   <Icon type="md-create" @click="Editable" v-if="!editable"/>
                   <Icon type="md-done-all" @click="EditDone" v-if="editable"/>
                 </TabPane>
-
-                <TabPane label="评分办法">标签二的内容</TabPane>
-                <TabPane label="标签三">标签三的内容</TabPane>
+                <TabPane label="评分办法">
+                  <Input v-model="originCurriculum.criterion" type="textarea" :autosize="{minRows: 4}"
+                         placeholder="Enter something..." :disabled="!editable2"/>
+                  <Icon type="md-create" @click="Editable2" v-if="!editable2"/>
+                  <Icon type="md-done-all" @click="EditDone2" v-if="editable2"/>
+                </TabPane>
+                <TabPane label="课程目标">
+                  <el-table
+                      :data="curriculumData"
+                      max-height="550px"
+                      style="width: 100%;">
+                    <el-table-column
+                        label="课程目标 ID"
+                        prop="id">
+                    </el-table-column>
+                    <el-table-column
+                        label="课程目标"
+                        prop="name">
+                    </el-table-column>
+                    <el-table-column
+                        label="课程目标描述"
+                        prop="description"
+                        :show-overflow-tooltip="true">
+                    </el-table-column>
+                  </el-table>
+                </TabPane>
               </Tabs>
             </template>
           </Content>
@@ -72,6 +87,7 @@ export default {
     return {
       originCurriculum : {},
       editable: false,
+      editable2: false,
       tableData: [
         {
           id: '',
@@ -82,6 +98,11 @@ export default {
           criterion: ''
         }
       ],
+      curriculumData: [{
+        id : '',
+        name: '',
+        description: ''
+      }]
     }
   },
   created() {
@@ -98,17 +119,20 @@ export default {
     },
     EditDone () {
       this.editable = !this.editable
-      console.log(this.originCurriculum.outline)
       this.$axios({
         method : "post",
         url : "/obe/cur/edit",
         data : this.originCurriculum,
-      }).then((res) => {
-        if (res.data.data === 1) {
-          this.$router.push("CurriculumList");
-        } else {
-          alert("error");
-        }
+      })
+    }, Editable2 () {
+      this.editable2 = !this.editable2
+    },
+    EditDone2 () {
+      this.editable2 = !this.editable2
+      this.$axios({
+        method : "post",
+        url : "/obe/cur/edit",
+        data : this.originCurriculum,
       })
     }
   },
