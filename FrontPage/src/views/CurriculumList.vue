@@ -39,9 +39,9 @@
         <Layout :style="{padding: '14px 24px'}">
           <Content :style="{padding: '24px', minHeight: '280px', background: '#fff'}">
             <el-row>
-              <span>培养方案管理</span>
+              <span>课程体系管理</span>
               <router-link to="CurriculumListEdit">
-                <el-button style="float: right">新增方案</el-button>
+                <el-button style="float: right">新增课程</el-button>
               </router-link>
 
             </el-row>
