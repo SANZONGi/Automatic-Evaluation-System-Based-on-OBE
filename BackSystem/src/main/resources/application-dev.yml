@@ -19,6 +19,12 @@ spring:
         min-idle: 0
         max-active: 50
         max-wait: -1
+  data:
+    mongodb:
+      database: OBE
+      host: localhost
+      port: 27017
+      authentication-database: admin
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**.xml
   configuration:
