@@ -3,7 +3,6 @@ package com.sanzong.obe.controller;
 
 import cn.hutool.json.JSONObject;
 import com.sanzong.obe.entity.Curriculum;
-import com.sanzong.obe.entity.GraduationRequirement;
 import com.sanzong.obe.service.ICurriculumService;
 import com.sanzong.obe.utils.ResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;

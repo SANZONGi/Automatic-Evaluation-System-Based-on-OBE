@@ -3,7 +3,7 @@ import router from './router';
 
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requireAuth)) {
-        if (localStorage.getItem('token') && sessionStorage.getItem("userInfo")) {
+        if (localStorage.getItem('token')) {
             if (to.name !== 'Login') next()        //
             else next({
                 name: "Login"

@@ -2,23 +2,20 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import Element from 'element-ui'
-import "element-ui/lib/theme-chalk/index.css"
-import "./axios"
 import axios from "axios";
-import "./guard"
-import VueQuillEditor from 'vue-quill-editor'
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
+import Element from 'element-ui'
 import iView from 'view-design'
+import "./axios"
+import "./guard"
 import 'view-design/dist/styles/iview.css'
-Vue.use(VueQuillEditor)
+import "element-ui/lib/theme-chalk/index.css"
+
+Vue.use(Element)
 Vue.use(iView);
 
 Vue.prototype.$axios = axios
 Vue.config.productionTip = false
-Vue.use(Element)
+
 new Vue({
   router,
   store,//注册store
