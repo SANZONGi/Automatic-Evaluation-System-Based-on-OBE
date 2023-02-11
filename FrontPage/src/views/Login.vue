@@ -55,8 +55,8 @@ export default {
           alert(res.data.msg)
         } else {
           //登录成功
-          this.$router.push("Home")
-          // this.$store.commit("SET_TOKEN", res.data.msg)//改变SET_TOKEN中的值，用res.data.msg传回store.js中代替原本store中的token值
+
+          this.$store.commit("SET_TOKEN", res.data.data)//改变SET_TOKEN中的值，用res.data.msg传回store.js中代替原本store中的token值
           // this.$store.commit("SET_USERINF", res.data.data)
           // this.$axios({
           //   method: "get",
@@ -82,6 +82,7 @@ export default {
           //     this.$router.push("Custhistory")
           //   }
           // })
+          this.$router.push("Home")
         }
       })
     },

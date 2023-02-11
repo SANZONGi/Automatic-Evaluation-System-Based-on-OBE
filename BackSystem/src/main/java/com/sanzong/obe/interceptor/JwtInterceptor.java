@@ -36,14 +36,12 @@ public class JwtInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
-//        HandlerMethod handlerMethod = (HandlerMethod) handler;
-//        Method method = handlerMethod.getMethod();
-//        LoginRequired annotation = method.getAnnotation(LoginRequired.class);
-//        //无此注解放行
-//        if (annotation == null)
-//        {
-//            return true;
-//        }
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        Method method = handlerMethod.getMethod();
+        LoginRequired annotation = method.getAnnotation(LoginRequired.class);
+        if (annotation == null || annotation.required() == false) {
+            return true;
+        }
         Map<String, Object> map = new HashMap<>(10);
 
         String token = request.getHeader("token");

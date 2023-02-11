@@ -26,7 +26,7 @@ spring:
       port: 27017
       authentication-database: admin
 mybatis-plus:
-  mapper-locations: classpath*:/mapper/**.xml
+  mapper-locations: classpath*:/mapper/obe/**.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql日志
 server:

@@ -1,15 +1,15 @@
 package com.sanzong.obe.controller;
 
 
-import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import com.sanzong.obe.entity.TrainingProgram;
 import com.sanzong.obe.service.impl.TrainingProgramServiceImpl;
+import com.sanzong.obe.utils.PermissionContent;
 import com.sanzong.obe.utils.ResponseBody;
-import org.apache.ibatis.annotations.Delete;
+import com.sanzong.obe.utils.annotations.LoginRequired;
+import com.sanzong.obe.utils.annotations.PermissionRequired;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.spring.web.json.Json;
 
 
 /**
@@ -26,6 +26,9 @@ public class TrainingProgramController{
     @Autowired
     TrainingProgramServiceImpl trainingProgramService;
 
+
+    @LoginRequired(required = true)
+    @PermissionRequired(role = PermissionContent.TRAIN_PROGRAM_WRITE)
     @PostMapping("/edit")
     public ResponseBody editProgram(@RequestBody JSONObject jsonObject) {
         String name = jsonObject.getStr("name");

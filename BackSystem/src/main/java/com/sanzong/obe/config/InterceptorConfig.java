@@ -1,6 +1,7 @@
 package com.sanzong.obe.config;
 
 import com.sanzong.obe.interceptor.JwtInterceptor;
+import com.sanzong.obe.interceptor.PermissionInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,33 +23,15 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     @Autowired
     private JwtInterceptor jwtInterceptor;
-
-
+    @Autowired
+    private PermissionInterceptor permissionInterceptor;
     /**
      * jwt拦截
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor).addPathPatterns("/**");
-//        registry.addInterceptor(roleInterceptor).addPathPatterns("/**");
+        registry.addInterceptor(permissionInterceptor).addPathPatterns("/**");
     }
 
-
-    //资源访问
-//    @Override
-//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//        String res = "file:/home/ubuntu/imgs/";
-//        if (File.separator.equals("/")) {
-////            System.out.println("linux");
-//        } else {
-//            res = "file:///"+LocalImgPath;
-////            System.out.println("other");
-//        }
-//        registry.addResourceHandler("/static/**").addResourceLocations(res);
-////        if (!registry.hasMappingForPattern("/**")) {
-////            registry.addResourceHandler("/**").addResourceLocations(
-////                    CLASSPATH_RESOURCE_LOCATIONS);
-////        }
-//
-//    }
 }

@@ -22,12 +22,14 @@ public class JwtUtils {
     /**
      * 生成jwt token
      */
-    public String generateToken(Map<String, String> mp) {
+    public String generateToken(Map<String, String>  mp) {
+
         Calendar instance = Calendar.getInstance();
         instance.add(Calendar.HOUR, 3);
         JWTCreator.Builder builder = JWT.create();
         mp.forEach(builder::withClaim);
         return builder.withExpiresAt(instance.getTime()).sign(Algorithm.HMAC256(secret));
+
     }
 
     public DecodedJWT verify(String token) {

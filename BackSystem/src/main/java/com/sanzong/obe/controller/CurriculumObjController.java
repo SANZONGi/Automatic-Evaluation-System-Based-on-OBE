@@ -5,7 +5,9 @@ import cn.hutool.json.JSONObject;
 import com.sanzong.obe.entity.Curriculum;
 import com.sanzong.obe.entity.CurriculumObj;
 import com.sanzong.obe.service.ICurriculumObjService;
+import com.sanzong.obe.utils.PermissionContent;
 import com.sanzong.obe.utils.ResponseBody;
+import com.sanzong.obe.utils.annotations.PermissionRequired;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,7 @@ public class CurriculumObjController{
     @Autowired
     ICurriculumObjService curriculumObjService;
 
+    @PermissionRequired(role = {PermissionContent.TRAIN_PROGRAM_WRITE})
     @PostMapping("/edit")
     public ResponseBody editCurriculumList(@RequestBody JSONObject jsonObject) {
         Integer id = jsonObject.getInt("id");
