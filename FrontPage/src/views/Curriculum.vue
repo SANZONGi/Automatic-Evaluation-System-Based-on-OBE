@@ -32,7 +32,7 @@
             </el-row>
 
             <template>
-              <Tabs type="card" style="margin-top: 20px" v-model="modelValue" :value="modelValue">
+              <Tabs type="card" style="margin-top: 20px" v-model="modelValue" :value="modelValue" @on-tab-remove="handleTabRemove">
                 <TabPane label="课程大纲">
 <!--                  v-model禁止使用this-->
                   <Input v-model="originCurriculum.outline" type="textarea" :autosize="{minRows: 4}"
@@ -40,13 +40,43 @@
                   <Icon type="md-create" @click="Editable" v-if="!editable"/>
                   <Icon type="md-done-all" @click="EditDone" v-if="editable"/>
                 </TabPane>
+                <TabPane label="课程任务" name="tAssignment">
+                  <el-row>
+                    <el-button style="float: right" @click="()=>{this.assignmentAdd=true;modelValue='assignmentAdd'}">新增任务</el-button>
+                  </el-row>
+                  <el-table
+                      :data="assignmentData"
+                      max-height="550px"
+                      style="width: 100%;">
+                    <el-table-column
+                        label="课程任务 ID"
+                        prop="id">
+                    </el-table-column>
+                    <el-table-column
+                        label="课程任务"
+                        prop="name">
+                    </el-table-column>
+                    <el-table-column
+                        fixed="right"
+                        label="操作"
+                        width="50px"
+                        :show-overflow-tooltip="true">
+                      <template slot-scope="scope">
+                        <el-button @click="Adetails(scope.row)" type="text" size="small">详情</el-button>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </TabPane>
                 <TabPane label="评分办法">
                   <Input v-model="originCurriculum.criterion" type="textarea" :autosize="{minRows: 4}"
                          placeholder="Enter something..." :disabled="!editable2"/>
                   <Icon type="md-create" @click="Editable2" v-if="!editable2"/>
                   <Icon type="md-done-all" @click="EditDone2" v-if="editable2"/>
                 </TabPane>
-                <TabPane label="课程目标">
+                <TabPane label="课程目标" name="tObj">
+                  <el-row>
+                      <el-button style="float: right" @click="()=>{this.objAdd=true;modelValue='objAdd'}">新增目标</el-button>
+                  </el-row>
                   <el-table
                       :data="curriculumData"
                       max-height="550px"
@@ -75,7 +105,7 @@
                     </el-table-column>
                   </el-table>
                 </TabPane>
-                <TabPane label="课程目标新增">
+                <TabPane v-if="objAdd" label="课程目标新增" name="objAdd" closable="true">
                   <Form ref="curriculumObj" :model="curriculumObj" label-position="top">
                     <FormItem label="课程目标">
                       <Input v-model="curriculumObj.obj"/>
@@ -85,11 +115,19 @@
                     </FormItem>
                   </Form>
                   <Button type="primary" @click="handleSubmit()">Submit</Button>
-                </TabPane>
-                <TabPane label="课程目标详情" disabled="disabled" name="detail">
+                </TabPane >
+                <TabPane v-if="assignmentAdd" label="课程任务新增" name="assignmentAdd" closable="true">
+                  <Form ref="curriculumObj" :model="assignmentDetail" label-position="top">
+                    <FormItem label="课程任务">
+                      <Input v-model="assignment.name"/>
+                    </FormItem>
+                  </Form>
+                  <Button type="primary" @click="handleSubmitAssignment()">Submit</Button>
+                </TabPane >
+                <TabPane v-if="objDetails" label="课程目标详情" name="objDetails" closable="true">
                   <Form :model="curriculumObj" label-position="top">
-                    <FormItem label="课程目标 ID" disabled="disabled">
-                      <Input v-model="curriculumObjDetail.id"/>
+                    <FormItem label="课程目标 ID" >
+                      <Input v-model="curriculumObjDetail.id" disabled="disabled"/>
                     </FormItem>
                     <FormItem label="课程目标">
                       <Input v-model="curriculumObjDetail.curriculumObj"/>
@@ -99,6 +137,17 @@
                     </FormItem>
                   </Form>
                   <Button type="primary" @click="handleChange()">Submit</Button>
+                </TabPane>
+                <TabPane v-if="assignmentDetails" label="课程任务详情" name="assignmentDetails" closable="true">
+                  <Form :model="curriculumObj" label-position="top">
+                    <FormItem label="课程任务 ID" >
+                      <Input v-model="assignmentDetail.id" disabled="true"/>
+                    </FormItem>
+                    <FormItem label="课程任务">
+                      <Input v-model="assignmentDetail.name"/>
+                    </FormItem>
+                  </Form>
+                  <Button type="primary" @click="handleChangeAssignment()">Submit</Button>
                 </TabPane>
               </Tabs>
             </template>
@@ -121,6 +170,10 @@ export default {
     return {
       modelValue: "",
       originCurriculum : {},
+      objDetails: false,
+      objAdd: false,
+      assignmentDetails: false,
+      assignmentAdd: false,
       editable: false,
       editable2: false,
       tableData: [
@@ -143,7 +196,22 @@ export default {
         obj : '',
         description: ''
       },
-      curriculumObjDetail: {}
+      curriculumObjDetail: {},
+      assignment:{
+        id: '',
+        name: '',
+        curriculumId: ''
+      },
+      assignmentDetail:{
+        id: '',
+        name: '',
+        curriculumId: ''
+      },
+      assignmentData: [{
+        id: '',
+        name: '',
+        curriculumId: ''
+      }]
     }
   },
   created() {
@@ -166,7 +234,15 @@ export default {
         });
       }
     })
-  }, methods: {
+    this.$axios.get("/obe/cur/assignment/list").then(res=>{
+      this.assignmentData = res.data.data
+    })
+  },
+  methods: {
+    handleTabRemove(name){
+      this[name] = false;
+      console.log(name)
+    },
     Editable () {
       this.editable = !this.editable
     },
@@ -203,6 +279,23 @@ export default {
           });
         }
       })
+      this.modelValue="tObj"
+    },
+    handleSubmitAssignment() {
+      this.assignment.curriculumId = this.originCurriculum.id
+      this.$axios({
+        method : "post",
+        url : "/obe/cur/assignment/edit",
+        data : this.assignment,
+      }).then(res =>{
+        if (res.data.data === 1) {
+          this.$Message['success']({
+            background: true,
+            content: '添加成功'
+          });
+        }
+      })
+      this.modelValue="tAssignment"
     },
     handleChange() {
       this.$axios({
@@ -217,10 +310,32 @@ export default {
           });
         }
       })
+      this.objDetails = false
+    },
+    handleChangeAssignment() {
+      this.$axios({
+        method : "post",
+        url : "/obe/cur/assignment/edit",
+        data : this.assignmentDetail,
+      }).then(res =>{
+        if (res.data.data === 1) {
+          this.$Message['success']({
+            background: true,
+            content: '修改成功'
+          });
+        }
+      })
+      this.assignmentDetails = false
     },
     details(curriculumObjDetail) {
+      this.objDetails = true
       this.curriculumObjDetail = curriculumObjDetail
-      this.modelValue = 'detail';
+      this.modelValue = 'objDetails';
+    } ,
+    Adetails(assignmentDetail) {
+      this.assignmentDetails = true
+      this.assignmentDetail = assignmentDetail
+      this.modelValue = 'assignmentDetails';
     }
   },
 
