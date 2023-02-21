@@ -55,33 +55,8 @@ export default {
           alert(res.data.msg)
         } else {
           //登录成功
-
-          this.$store.commit("SET_TOKEN", res.data.data)//改变SET_TOKEN中的值，用res.data.msg传回store.js中代替原本store中的token值
-          // this.$store.commit("SET_USERINF", res.data.data)
-          // this.$axios({
-          //   method: "get",
-          //   url: "/v2.0/role/" + this.$store.getters.getUser.uid
-          // }).then(res => {
-          //   if (res.data.data.role === 0) {//返回的role值是1说明应该进入卖家页面
-          //     this.$message({
-          //       type: "success",
-          //       message: "尊敬的管理员,登陆成功"
-          //     })
-          //     console.log(res.data.data)
-          //     localStorage.setItem("uid", res.data.data.uid)
-          //     localStorage.setItem("role", res.data.data.role)
-          //     this.$router.push("Userhome")
-          //   } else if (res.data.data.role === 1) {//普通用户
-          //     this.$message({
-          //       type: "success",
-          //       message: "登陆成功"
-          //     })
-          //     localStorage.setItem("uid", res.data.data.uid)
-          //     localStorage.setItem("role", res.data.data.role)
-          //     console.log(res.data.data)
-          //     this.$router.push("Custhistory")
-          //   }
-          // })
+          this.$store.commit("SET_TOKEN", res.data.msg)//改变SET_TOKEN中的值，用res.data.msg传回store.js中代替原本store中的token值
+          this.$store.commit("SET_USERINF", res.data.data)
           this.$router.push("Home")
         }
       })

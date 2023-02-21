@@ -66,7 +66,9 @@ public class UserController{
                     }
                 });
                 log.info("generate token ================= {}", token);
-                return new ResponseBody("success" , token);
+                user.setPasswd(null);
+                user.setSalt(null);
+                return new ResponseBody("success" , user , token);
             }
         }
 
@@ -87,4 +89,31 @@ public class UserController{
         userService.save(new User(account, hashedPwd, salt));
         return new ResponseBody("success", null);
     }
+
+    @LoginRequired
+    @PostMapping("/editInf")
+    public ResponseBody editUserInf(@RequestBody User user) {
+        userService.updateById(user);
+        return new ResponseBody("success", null);
+    }
+
+    @LoginRequired
+    @PostMapping("/changePwd")
+    public ResponseBody changePwd(@RequestBody JSONObject jsonObject) {
+        ResponseBody verifyUserBody = verifyUser(jsonObject);
+        if ("success".equals(verifyUserBody.getStatus())) {
+            User user = (User) verifyUserBody.getData();
+            String newPwd = jsonObject.getStr("newPwd");
+            String salt = BCrypt.gensalt();
+            String hashedPwd = BCrypt.hashpw(newPwd, salt);
+            user.setSalt(salt);
+            user.setPasswd(hashedPwd);
+            userService.updateById(user);
+        } else {
+            return new ResponseBody("fail", null);
+        }
+        return new ResponseBody("success", null);
+    }
+
+
 }

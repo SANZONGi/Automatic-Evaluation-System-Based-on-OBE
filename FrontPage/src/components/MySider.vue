@@ -1,5 +1,6 @@
 <template>
-  <Menu theme="light" width="auto" :open-names="active_names" :active-name="active" @on-select="Select" @on-open-change="openChange">
+  <Menu theme="light" width="auto" :open-names="active_names" :active-name="active" @on-select="Select"
+        @on-open-change="openChange">
     <Submenu name="1">
       <template #title>
         <Icon type="ios-navigate"></Icon>
@@ -32,12 +33,17 @@
       </template>
       <MenuItem name="4-1">课程大纲管理</MenuItem>
       <MenuItem name="4-2">课程目标管理</MenuItem>
-      <MenuItem name="4-3">学业活动考核标准管理
-      </MenuItem>
-      <MenuItem name="4-4">学生成绩-课程目标分数支撑矩阵
-      </MenuItem>
-      <MenuItem name="4-5">学生成绩管理
-      </MenuItem>
+      <MenuItem name="4-3">学业活动考核标准管理</MenuItem>
+      <MenuItem name="4-4">学生成绩-课程目标分数支撑矩阵</MenuItem>
+      <MenuItem name="4-5">学生成绩管理</MenuItem>
+    </Submenu>
+    <Submenu name="5">
+      <template #title>
+        <Icon type="md-person" />
+        信息管理
+      </template>
+      <MenuItem name="5-1" to="UserInf">个人信息</MenuItem>
+      <MenuItem name="5-1" to="ChangePwd">修改密码</MenuItem>
     </Submenu>
   </Menu>
 </template>
@@ -46,10 +52,10 @@
 export default {
   data() {
     return {
-      active : '',
+      active: '',
       active_names: []
     }
-  },methods: {
+  }, methods: {
     Select(name) {
       this.active = name
       localStorage.setItem("active-item-name", name)
@@ -58,7 +64,7 @@ export default {
       this.active_names = names
       localStorage.setItem("active-menu-name", JSON.stringify(names))
     }
-  },created() {
+  }, created() {
     this.active = localStorage.getItem("active-item-name")
     this.active_names = JSON.parse(localStorage.getItem("active-menu-name"))
   }

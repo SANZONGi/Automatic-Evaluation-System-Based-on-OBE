@@ -1,17 +1,18 @@
 <style>
-.layout-logo{
-width: 100px;
-height: 30px;
-background: #5b6270;
-border-radius: 3px;
-float: left;
-position: relative;
-top: 15px;
-left: 20px;
+.layout-logo {
+  width: 100px;
+  height: 30px;
+  background: #5b6270;
+  border-radius: 3px;
+  float: left;
+  position: relative;
+  top: 15px;
+  left: 20px;
 }
-.layout-nav{
-width: 420px;
-margin: 0 20px 0 auto;
+
+.layout-nav {
+  width: 420px;
+  margin: 0 20px 0 auto;
 }
 </style>
 
@@ -32,11 +33,17 @@ margin: 0 20px 0 auto;
           </el-select>
         </MenuItem>
         <Dropdown trigger="click" style="margin-left: 20px">
-          <Avatar icon="ios-person" size="large" />
+          <Avatar icon="ios-person" size="large"/>
           <template #list>
             <DropdownMenu>
-              <DropdownItem>信息管理</DropdownItem>
-              <DropdownItem>推出登录</DropdownItem>
+              <router-link to="UserInf">
+                <DropdownItem>
+                  信息管理
+                </DropdownItem>
+              </router-link>
+                <DropdownItem>
+                  <span @click="logout">退出登录</span>
+                </DropdownItem>
             </DropdownMenu>
           </template>
         </Dropdown>
@@ -52,7 +59,7 @@ export default {
   name: "MyHeader",
   data() {
     return {
-      options : [{
+      options: [{
         id: '',
         name: '',
         grade: '',
@@ -65,17 +72,22 @@ export default {
     if (localStorage.getItem("program") !== null) {
       this.value = JSON.parse(localStorage.getItem("program"))
     }
-    this.$axios.get("/obe/program/list").then(res=>{
-      if(res.data.status === "success") {
+    this.$axios.get("/obe/program/list").then(res => {
+      if (res.data.status === "success") {
         this.options = res.data.data;
       } else {
         alert("error");
       }
     })
-  },methods : {
+  }, methods: {
     Change() {
       localStorage.setItem("program", JSON.stringify(this.value))
       this.reload()
+    },
+    logout () {
+      this.$store.commit("REMOVE_INFO")
+      this.$router.push("Login")
+      this.$Message.info("退出成功")
     }
   }
 }
