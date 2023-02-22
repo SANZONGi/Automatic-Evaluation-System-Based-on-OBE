@@ -149,6 +149,16 @@
                   </Form>
                   <Button type="primary" @click="handleChangeAssignment()">Submit</Button>
                 </TabPane>
+                <TabPane label="课程目标支撑矩阵" name="martix">
+                  <template>
+                      <el-table :data="matrix" style="width: 100%" border>
+                        <el-table-column prop="color" label="课程任务\课程目标" width="180"> </el-table-column>
+                        <el-table-column v-for="(i, index) in curriculumObjectives" :label="i" align="center" header-align="center" :key="index">
+                          <template v-slot="scope">{{ scope.row[i] }}</template>
+                        </el-table-column>
+                      </el-table>
+                  </template>
+                </TabPane>
               </Tabs>
             </template>
           </Content>
@@ -168,6 +178,25 @@ export default {
   components: {MyHeader, MySider},
   data() {
     return {
+      //表格数据
+      curriculumObjectives: ["x", "xl"],
+      matrix: [
+        {
+          color: "red",
+          xl: 10,
+          x: 0
+        },
+        {
+          color: "blue",
+          xl: 10,
+          x: 0
+        },
+        {
+          color: "black",
+          xl: 10,
+          x: 5
+        }
+      ],
       modelValue: "",
       originCurriculum : {},
       objDetails: false,
