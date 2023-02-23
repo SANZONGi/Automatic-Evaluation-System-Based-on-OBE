@@ -2,6 +2,7 @@ package com.sanzong.obe.controller;
 
 
 import cn.hutool.json.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sanzong.obe.entity.Curriculum;
 import com.sanzong.obe.entity.CurriculumObj;
 import com.sanzong.obe.service.ICurriculumObjService;
@@ -10,6 +11,8 @@ import com.sanzong.obe.utils.ResponseBody;
 import com.sanzong.obe.utils.annotations.PermissionRequired;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>
@@ -31,13 +34,19 @@ public class CurriculumObjController{
         Integer id = jsonObject.getInt("id");
         String obj = jsonObject.getStr("obj");
         String description = jsonObject.getStr("description");
-        CurriculumObj curriculumObj = new CurriculumObj(id, obj, description);
+        Integer curriculumId = jsonObject.getInt("curriculumId");
+        CurriculumObj curriculumObj = new CurriculumObj(id, obj, description, curriculumId);
         curriculumObjService.saveOrUpdate(curriculumObj);
         return new ResponseBody("success", 1, null);
     }
 
-    @GetMapping("/list")
-    public ResponseBody getCurriculumList() {
-        return new ResponseBody("success", curriculumObjService.list(), null);
+    @GetMapping("/list/{curriculumId}")
+    public ResponseBody getCurriculumObjList(@PathVariable int curriculumId) {
+        return new ResponseBody("success", curriculumObjService.list(new QueryWrapper<CurriculumObj>().eq("curriculum_id", curriculumId)), null);
+    }
+
+    @GetMapping("/matrix/{curriculumId}")
+    public ResponseBody getMatrix(@PathVariable int curriculumId) {
+        return new ResponseBody("success", curriculumObjService.getMatrix(curriculumId));
     }
 }

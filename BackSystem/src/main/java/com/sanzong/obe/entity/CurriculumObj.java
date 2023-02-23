@@ -30,4 +30,5 @@ public class CurriculumObj  {
 
     private String description;
 
+    private Integer curriculumId;
 }
