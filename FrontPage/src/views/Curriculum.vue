@@ -154,17 +154,31 @@
                   <Button type="primary" @click="handleChangeAssignment()">Submit</Button>
                 </TabPane>
                 <TabPane label="课程目标支撑矩阵" name="martix">
-                  <el-table :data="matrix" style="width: 100%" border :summary-method="getSummaries" show-summary @cell-click="selectCell">
+                  <el-table :data="matrix" style="width: 100%" border :summary-method="getSummaries" show-summary @cell-click="selectCell" v-if="flushSum">
                     <el-table-column fixed prop="assignment.name" label="课程任务\课程目标"
                                      width="180"></el-table-column>
                     <el-table-column v-for="(i, index) in matrix"
                                      :label="i.objArray[index].curriculumObj.curriculumObj" align="center"
                                      header-align="center" :key="index">
                       <template v-slot="scope">{{ scope.row.objArray[index].weight}}</template>
+                      <el-dialog title="权重修改" :visible.sync="dialogFormVisible" append-to-body>
+                      <el-form>
+                        <el-form-item label="比例" label-width="50px">
+                          <el-input v-model="cellEdit.weight" autocomplete="off"></el-input>
+                        </el-form-item>
+                      </el-form>
+                      <div slot="footer" class="dialog-footer">
+                        <el-button @click="dialogFormVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="doneDialog">确 定</el-button>
+                      </div>
+                    </el-dialog>
                     </el-table-column>
                   </el-table>
+
                 </TabPane>
+
               </Tabs>
+
             </template>
           </Content>
         </Layout>
@@ -184,6 +198,7 @@ export default {
   data() {
     return {
       // curriculumObjectives: [],
+      dialogFormVisible: false,
       matrix: [{
         assignment: {id: '', name: ''},
         objArray: [
@@ -246,7 +261,13 @@ export default {
         id: '',
         name: '',
         curriculumId: ''
-      }]
+      }],
+      cellEdit : {
+        curriculumObjId : '',
+        assignmentId: '',
+        weight: ''
+      },
+      flushSum: true
     }
   },
   created() {
@@ -372,15 +393,38 @@ export default {
       for (let i = 0; i < this.matrix.length; i++) {
         let objA = this.matrix[i].objArray;
         for (let j = 0;j < objA.length;j++) {
-          if(sums[j+1] === undefined) sums[j+1] = 0;
+          if(sums[j+1] === undefined) sums[j+1] = objA[j].weight;
           else sums[j+1] += Number(objA[j].weight)
         }
       }
       return sums;
     },
     selectCell(row, column) {
-      console.log(row);
-      console.log(column);
+      this.dialogFormVisible = true
+      this.cellEdit.assignmentId = row.assignment.id
+      for(let i = 0;i < row.objArray.length;i++) {
+        let tmp = row.objArray[i];
+        if (tmp.curriculumObj.curriculumObj === column.label) {
+          this.cellEdit.curriculumObjId = tmp.curriculumObj.id
+          this.cellEdit.weight = tmp.weight
+        }
+      }
+    },
+    doneDialog() {
+      this.dialogFormVisible = false
+      for(let i = 0 ; i < this.matrix.length;i++) {
+        if (this.matrix[i].assignment.id === this.cellEdit.assignmentId) {
+          let objArr = this.matrix[i].objArray
+          for (let j = 0 ; j < objArr.length ; j++) {
+            if (objArr[j].curriculumObj.id === this.cellEdit.curriculumObjId) {
+              this.matrix[i].objArray[j].weight = this.cellEdit.weight
+            }
+          }
+        }
+      }
+      this.getSummaries()
+      this.$axios.post("/obe/cur_obj/matrix/updateWeight", this.cellEdit);
+
     }
   },
 
