@@ -1,9 +1,9 @@
 package com.sanzong.obe.entity;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
@@ -17,6 +17,9 @@ public class StudentModel {
     @Field("NAME")
     private String name;
 
-    private JSONObject jsonObject;
+    private String curId;
 
+    private JSONArray detail;
+
+    private JSONObject realDetail;
 }

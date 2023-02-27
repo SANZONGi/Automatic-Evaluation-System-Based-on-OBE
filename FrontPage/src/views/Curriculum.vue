@@ -38,7 +38,7 @@
                   <!--                  v-model禁止使用this-->
                   <Input v-model="originCurriculum.outline" type="textarea" :autosize="{minRows: 4}"
                          placeholder="Enter something..." :disabled="!editable"/>
-                  <Icon type="md-create" @click="Editable" v-if="!editable"/>
+                  <Icon type="md-create" @click="editable=!editable" v-if="!editable"/>
                   <Icon type="md-done-all" @click="EditDone" v-if="editable"/>
                 </TabPane>
                 <TabPane label="课程任务" name="tAssignment">
@@ -73,7 +73,7 @@
                 <TabPane label="评分办法">
                   <Input v-model="originCurriculum.criterion" type="textarea" :autosize="{minRows: 4}"
                          placeholder="Enter something..." :disabled="!editable2"/>
-                  <Icon type="md-create" @click="Editable2" v-if="!editable2"/>
+                  <Icon type="md-create" @click="editable2 = !editable2" v-if="!editable2"/>
                   <Icon type="md-done-all" @click="EditDone2" v-if="editable2"/>
                 </TabPane>
                 <TabPane label="课程目标" name="tObj">
@@ -154,29 +154,48 @@
                   <Button type="primary" @click="handleChangeAssignment()">Submit</Button>
                 </TabPane>
                 <TabPane label="课程目标支撑矩阵" name="martix">
-                  <el-table :data="matrix" style="width: 100%" border :summary-method="getSummaries" show-summary @cell-click="selectCell" v-if="flushSum">
+                  <el-table :data="matrix" style="width: 100%" border :summary-method="getSummaries" show-summary
+                            @cell-click="selectCell" v-if="flushSum">
                     <el-table-column fixed prop="assignment.name" label="课程任务\课程目标"
                                      width="180"></el-table-column>
                     <el-table-column v-for="(i, index) in matrix"
                                      :label="i.objArray[index].curriculumObj.curriculumObj" align="center"
                                      header-align="center" :key="index">
-                      <template v-slot="scope">{{ scope.row.objArray[index].weight}}</template>
+                      <template v-slot="scope">{{ scope.row.objArray[index].weight }}</template>
                       <el-dialog title="权重修改" :visible.sync="dialogFormVisible" append-to-body>
-                      <el-form>
-                        <el-form-item label="比例" label-width="50px">
-                          <el-input v-model="cellEdit.weight" autocomplete="off"></el-input>
-                        </el-form-item>
-                      </el-form>
-                      <div slot="footer" class="dialog-footer">
-                        <el-button @click="dialogFormVisible = false">取 消</el-button>
-                        <el-button type="primary" @click="doneDialog">确 定</el-button>
-                      </div>
-                    </el-dialog>
+                        <el-form>
+                          <el-form-item label="比例" label-width="50px">
+                            <el-input v-model="cellEdit.weight" autocomplete="off"></el-input>
+                          </el-form-item>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                          <el-button @click="dialogFormVisible = false">取 消</el-button>
+                          <el-button type="primary" @click="doneDialog">确 定</el-button>
+                        </div>
+                      </el-dialog>
                     </el-table-column>
                   </el-table>
+                </TabPane>
+                <TabPane label="成绩管理" name="score">
+                  <el-row>
+                    <el-upload
+                        class="upload-demo"
+                        action
+                        :on-change="handleFileChange"
+                        :on-exceed="handleExceed"
+                        :on-remove="handleRemove"
+                        :before-remove="beforeRemove"
+                        :limit="limitUpload"
+                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        :auto-upload="false"
+                    >
+                      <el-button size="small" type="primary">选择文件</el-button>
+                      <div slot="tip" class="el-upload__tip">只 能 上 传 xlsx / xls 文 件</div>
+                    </el-upload>
+                  </el-row>
+
 
                 </TabPane>
-
               </Tabs>
 
             </template>
@@ -197,7 +216,14 @@ export default {
   components: {MyHeader, MySider},
   data() {
     return {
-      // curriculumObjectives: [],
+      studentModel: {
+        name: '',
+        detail: [{assignment: '', score: ''}]
+      },
+      limitUpload: 1,
+      fileTemp: "",
+      file: "",
+      fileListUpload: [],
       dialogFormVisible: false,
       matrix: [{
         assignment: {id: '', name: ''},
@@ -262,8 +288,8 @@ export default {
         name: '',
         curriculumId: ''
       }],
-      cellEdit : {
-        curriculumObjId : '',
+      cellEdit: {
+        curriculumObjId: '',
         assignmentId: '',
         weight: ''
       },
@@ -272,7 +298,9 @@ export default {
   },
   created() {
     this.originCurriculum = this.$route.query.curriculum
-    if (this.originCurriculum.id === undefined) {this.originCurriculum = JSON.parse(localStorage.getItem("editingCur"))}
+    if (this.originCurriculum.id === undefined) {
+      this.originCurriculum = JSON.parse(localStorage.getItem("editingCur"))
+    }
     if (this.originCurriculum === null) this.$router.push("CurriculumList")
 
     this.$axios.get("/obe/cur_obj/list/" + this.originCurriculum.id).then(res => {
@@ -285,16 +313,65 @@ export default {
         });
       }
     })
-    this.$axios.get("/obe/cur/assignment/list/" + this.originCurriculum.id).then(res => {this.assignmentData = res.data.data})
-    this.$axios.get("/obe/cur_obj/matrix/" + this.originCurriculum.id).then(res => {this.matrix = res.data.data})
+    this.$axios.get("/obe/cur/assignment/list/" + this.originCurriculum.id).then(res => {
+      this.assignmentData = res.data.data
+    })
+    this.$axios.get("/obe/cur_obj/matrix/" + this.originCurriculum.id).then(res => {
+      this.matrix = res.data.data
+    })
+    this.$axios.get("/obe/cur/score/" + this.originCurriculum.id).then(res => {
+      console.log(res)
+    })
   },
   methods: {
+    handleFileChange(file) {
+      this.fileTemp = file.raw;
+      let form = new FormData
+      form.append("file", file.raw)
+      if (this.fileTemp) {
+        if (this.fileTemp.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+            this.fileTemp.type === "application/vnd.ms-excel") {
+          let instance = this.$axios.create({
+            baseURL: 'http://localhost:8081',
+            data: form,
+            headers: {'Content-Type': 'multipart/form-data'}
+          })
+          instance.post("/obe/cur/excel", form).then(res => {
+            console.log(res)
+          })
+          this.$message({
+            type: "info",
+            message: "选择成功"
+          })
+        } else {
+          this.$message({
+            type: "warning",
+            message: "附件格式错误，请删除后重新上传!"
+          });
+        }
+      }
+
+    },
+    beforeRemove(file) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
+    handleRemove() {
+      // console.log(file)
+      this.fileTemp = null;
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(
+          `当前限制选择1个文件，本次选择了 ${
+              files.length
+          } 个文件，共选择了 ${files.length + fileList.length} 个文件`
+      );
+    },
+
+
     handleTabRemove(name) {
       this[name] = false;
-    },
-    Editable() {
-      this.editable = !this.editable
-    },
+    }
+    ,
     EditDone() {
       this.editable = !this.editable
       this.$axios({
@@ -302,10 +379,8 @@ export default {
         url: "/obe/cur/edit",
         data: this.originCurriculum,
       })
-    },
-    Editable2() {
-      this.editable2 = !this.editable2
-    },
+    }
+    ,
     EditDone2() {
       this.editable2 = !this.editable2
       this.$axios({
@@ -313,7 +388,8 @@ export default {
         url: "/obe/cur/edit",
         data: this.originCurriculum,
       })
-    },
+    }
+    ,
     handleSubmit() {
       this.curriculumObj.curriculumId = this.originCurriculum.id
       this.$axios({
@@ -330,7 +406,8 @@ export default {
         }
       })
       this.modelValue = "tObj"
-    },
+    }
+    ,
     handleSubmitAssignment() {
       this.assignment.curriculumId = this.originCurriculum.id
       this.$axios({
@@ -346,7 +423,8 @@ export default {
         }
       })
       this.modelValue = "tAssignment"
-    },
+    }
+    ,
     handleChange() {
       this.$axios({
         method: "post",
@@ -361,7 +439,8 @@ export default {
         }
       })
       this.objDetails = false
-    },
+    }
+    ,
     handleChangeAssignment() {
       this.$axios({
         method: "post",
@@ -376,46 +455,51 @@ export default {
         }
       })
       this.assignmentDetails = false
-    },
+    }
+    ,
     details(curriculumObjDetail) {
       this.objDetails = true
       this.curriculumObjDetail = curriculumObjDetail
       this.modelValue = 'objDetails';
-    },
+    }
+    ,
     Adetails(assignmentDetail) {
       this.assignmentDetails = true
       this.assignmentDetail = assignmentDetail
       this.modelValue = 'assignmentDetails';
-    },
-    getSummaries () {
+    }
+    ,
+    getSummaries() {
       const sums = []
       sums[0] = '总计';
       for (let i = 0; i < this.matrix.length; i++) {
         let objA = this.matrix[i].objArray;
-        for (let j = 0;j < objA.length;j++) {
-          if(sums[j+1] === undefined) sums[j+1] = objA[j].weight;
-          else sums[j+1] += Number(objA[j].weight)
+        for (let j = 0; j < objA.length; j++) {
+          if (sums[j + 1] === undefined) sums[j + 1] = Number(objA[j].weight);
+          else sums[j + 1] += Number(objA[j].weight)
         }
       }
       return sums;
-    },
+    }
+    ,
     selectCell(row, column) {
       this.dialogFormVisible = true
       this.cellEdit.assignmentId = row.assignment.id
-      for(let i = 0;i < row.objArray.length;i++) {
+      for (let i = 0; i < row.objArray.length; i++) {
         let tmp = row.objArray[i];
         if (tmp.curriculumObj.curriculumObj === column.label) {
           this.cellEdit.curriculumObjId = tmp.curriculumObj.id
           this.cellEdit.weight = tmp.weight
         }
       }
-    },
+    }
+    ,
     doneDialog() {
       this.dialogFormVisible = false
-      for(let i = 0 ; i < this.matrix.length;i++) {
+      for (let i = 0; i < this.matrix.length; i++) {
         if (this.matrix[i].assignment.id === this.cellEdit.assignmentId) {
           let objArr = this.matrix[i].objArray
-          for (let j = 0 ; j < objArr.length ; j++) {
+          for (let j = 0; j < objArr.length; j++) {
             if (objArr[j].curriculumObj.id === this.cellEdit.curriculumObjId) {
               this.matrix[i].objArray[j].weight = this.cellEdit.weight
             }
@@ -426,7 +510,10 @@ export default {
       this.$axios.post("/obe/cur_obj/matrix/updateWeight", this.cellEdit);
 
     }
-  },
+    ,
+
+  }
+  ,
 
 }
 </script>

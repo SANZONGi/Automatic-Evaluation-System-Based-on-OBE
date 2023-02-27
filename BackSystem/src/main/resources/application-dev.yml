@@ -1,4 +1,10 @@
 spring:
+  servlet:
+    multipart:
+      enabled: true # 开启文件上传
+      file-size-threshold: 2000KB # 文件写入磁盘的阈值
+      max-file-size: 100MB
+      max-request-size: 215MB # 最大请求值大小
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/obe_evaluation_system?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
