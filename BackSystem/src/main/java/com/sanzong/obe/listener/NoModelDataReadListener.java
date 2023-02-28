@@ -11,7 +11,11 @@ import com.alibaba.fastjson2.JSONObject;
 import com.sanzong.obe.entity.StudentModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -35,10 +39,11 @@ public class NoModelDataReadListener implements ReadListener<Map<Integer, String
     private MongoTemplate mongoTemplate;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         noModelDataReadListener = this;
         noModelDataReadListener.mongoTemplate = this.mongoTemplate;
     }
+
     @Override
     public void invoke(Map<Integer, String> data, AnalysisContext context) {
         log.info("解析到一条数据:{}", JSON.toJSONString(data));
@@ -71,26 +76,38 @@ public class NoModelDataReadListener implements ReadListener<Map<Integer, String
     private void saveData() {
         log.info("{}条数据，开始存储数据库！", cachedDataList.size());
         int curId = getId(header.get(0));
-        for (Map<Integer,String> item:
-             cachedDataList) {
+        for (Map<Integer, String> item :
+                cachedDataList) {
             StudentModel studentModel = new StudentModel();
             studentModel.setName(item.get(0));
             studentModel.setDetail(new JSONArray());
             studentModel.setRealDetail(new JSONObject());
             studentModel.setCurId(String.valueOf(curId));
-            for (int i = 1;i < header.size();i++) {
+            for (int i = 1; i < header.size(); i++) {
                 JSONObject detailItem = new JSONObject();
                 detailItem.put("assignment", header.get(i));
                 detailItem.put("score", item.get(i));
                 studentModel.getDetail().add(detailItem);
             }
-            for (int i = 1;i < header.size();i++) {
+            for (int i = 1; i < header.size(); i++) {
                 studentModel.getRealDetail().put(String.valueOf(getId(header.get(i))), item.get(i));
             }
-            noModelDataReadListener.mongoTemplate.insert(studentModel);
+            Update update = new Update();
+            update.set("detail", studentModel.getDetail());
+            update.set("realDetail", studentModel.getRealDetail());
+            FindAndModifyOptions findAndModifyOptions = new FindAndModifyOptions();
+            // 不存在则插入
+            findAndModifyOptions.upsert(true);
+            noModelDataReadListener.mongoTemplate.findAndModify(
+                    new Query(Criteria.where("curId").is(String.valueOf(curId)).and("NAME").is(item.get(0))),
+                    update,
+                    findAndModifyOptions,
+                    StudentModel.class
+            );
 
             log.info("Mongo 格式 {}", studentModel);
-        };
+        }
+        ;
     }
 
     private Integer getId(String origin) {

@@ -155,7 +155,7 @@
                 </TabPane>
                 <TabPane label="课程目标支撑矩阵" name="martix">
                   <el-table :data="matrix" style="width: 100%" border :summary-method="getSummaries" show-summary
-                            @cell-click="selectCell" v-if="flushSum">
+                            @cell-click="selectCell">
                     <el-table-column fixed prop="assignment.name" label="课程任务\课程目标"
                                      width="180"></el-table-column>
                     <el-table-column v-for="(i, index) in matrix"
@@ -187,13 +187,20 @@
                         :before-remove="beforeRemove"
                         :limit="limitUpload"
                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                        :auto-upload="false"
-                    >
+                        :auto-upload="false">
                       <el-button size="small" type="primary">选择文件</el-button>
                       <div slot="tip" class="el-upload__tip">只 能 上 传 xlsx / xls 文 件</div>
                     </el-upload>
                   </el-row>
-
+                  <el-table :data="studentModel" style="width: 100%" border>
+                    <el-table-column fixed prop="name" label="课程任务\课程目标"
+                                     width="180"></el-table-column>
+                    <el-table-column v-for="(i, index) in studentModel"
+                                     :label="i.detail[index].assignment" align="center"
+                                     header-align="center" :key="index">
+                      <template v-slot="scope">{{ scope.row.detail[index].score }}</template>
+                    </el-table-column>
+                  </el-table>
 
                 </TabPane>
               </Tabs>
@@ -216,10 +223,16 @@ export default {
   components: {MyHeader, MySider},
   data() {
     return {
-      studentModel: {
-        name: '',
-        detail: [{assignment: '', score: ''}]
-      },
+      studentModel: [
+        {
+          curId: '',
+          detail:
+              {
+                name: '',
+                detail: [{assignment: '', score: ''}]
+              }
+        }
+      ],
       limitUpload: 1,
       fileTemp: "",
       file: "",
@@ -236,8 +249,7 @@ export default {
             weight: ''
           }
         ]
-      }
-      ],
+      }],
       weightCount: [{
         objId: '',
         obj: '',
@@ -293,7 +305,6 @@ export default {
         assignmentId: '',
         weight: ''
       },
-      flushSum: true
     }
   },
   created() {
@@ -320,8 +331,10 @@ export default {
       this.matrix = res.data.data
     })
     this.$axios.get("/obe/cur/score/" + this.originCurriculum.id).then(res => {
-      console.log(res)
+      this.studentModel = res.data.data
     })
+
+    this.modelValue = localStorage.getItem("actived_cur_tabpane")
   },
   methods: {
     handleFileChange(file) {
@@ -350,7 +363,8 @@ export default {
           });
         }
       }
-
+      localStorage.setItem("actived_cur_tabpane", this.modelValue)
+      this.reload()
     },
     beforeRemove(file) {
       return this.$confirm(`确定移除 ${file.name}？`);
