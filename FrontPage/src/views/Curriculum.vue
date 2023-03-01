@@ -204,7 +204,15 @@
 
                 </TabPane>
                 <TabPane label="课程目标达成度" name="achievement">
-
+                  <el-table :data="achievementMatrix" style="width: 100%" border>
+                    <el-table-column fixed prop="name" label="课程任务\课程目标"
+                                     width="180"></el-table-column>
+                    <el-table-column v-for="(i, index) in achievementMatrix"
+                                     :label="i.curObjAchievement[index].curObj" align="center"
+                                     header-align="center" :key="index">
+                      <template v-slot="scope">{{ scope.row.curObjAchievement[index].achievement }}</template>
+                    </el-table-column>
+                  </el-table>
                 </TabPane>
               </Tabs>
 
@@ -226,6 +234,13 @@ export default {
   components: {MyHeader, MySider},
   data() {
     return {
+      achievementMatrix: [{
+        name: '',
+        curObjAchievement: [{
+          achievement: '',
+          curObj: ''
+        }]
+      }],
       studentModel: [
         {
           curId: '',
@@ -336,7 +351,9 @@ export default {
     this.$axios.get("/obe/cur/score/" + this.originCurriculum.id).then(res => {
       this.studentModel = res.data.data
     })
-
+    this.$axios.get("/obe/cur_obj/matrix/achievement/" + this.originCurriculum.id).then(res=>{
+      this.achievementMatrix = res.data.data
+    })
     this.modelValue = localStorage.getItem("actived_cur_tabpane")
   },
   methods: {
