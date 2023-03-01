@@ -159,7 +159,7 @@
                     <el-table-column fixed prop="assignment.name" label="课程任务\课程目标"
                                      width="180"></el-table-column>
                     <el-table-column v-for="(i, index) in matrix"
-                                     :label="i.objArray[index].curriculumObj.curriculumObj" align="center"
+                                     :label="i.objArray[index].curriculumObj.curriculumObj+'  (%)'" align="center"
                                      header-align="center" :key="index">
                       <template v-slot="scope">{{ scope.row.objArray[index].weight }}</template>
                       <el-dialog title="权重修改" :visible.sync="dialogFormVisible" append-to-body>
@@ -201,6 +201,9 @@
                       <template v-slot="scope">{{ scope.row.detail[index].score }}</template>
                     </el-table-column>
                   </el-table>
+
+                </TabPane>
+                <TabPane label="课程目标达成度" name="achievement">
 
                 </TabPane>
               </Tabs>

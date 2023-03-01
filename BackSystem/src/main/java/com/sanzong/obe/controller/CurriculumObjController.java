@@ -73,4 +73,9 @@ public class CurriculumObjController {
         }
         return new ResponseBody("success", null);
     }
+
+    @GetMapping("matrix/achievement/{id}")
+    public ResponseBody getCurriculumAchievement(@PathVariable Integer id) {
+        return new ResponseBody("success", curriculumObjService.getCurriculumAchievement(id));
+    }
 }

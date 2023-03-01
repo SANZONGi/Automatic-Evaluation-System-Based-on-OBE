@@ -22,4 +22,6 @@ public class StudentModel {
     private JSONArray detail;
 
     private JSONObject realDetail;
+
+    private JSONArray curObjAchievement;
 }

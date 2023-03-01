@@ -14,6 +14,7 @@ public interface IMongodbService {
      * @return 学生信息
      */
     List<StudentModel> getStudentModel(String name);
+    List<StudentModel> getStudentModel(Integer id);
 
     void delStudentModel(String name);
 

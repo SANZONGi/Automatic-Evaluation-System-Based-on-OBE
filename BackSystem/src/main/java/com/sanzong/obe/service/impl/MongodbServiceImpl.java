@@ -27,6 +27,12 @@ public class MongodbServiceImpl implements IMongodbService {
     }
 
     @Override
+    public List<StudentModel> getStudentModel(Integer id) {
+        Query query = new Query(Criteria.where("curId").is(String.valueOf(id)));
+        return mongoTemplate.find(query, StudentModel.class);
+    }
+
+    @Override
     public void delStudentModel(String name) {
         Query query = new Query(Criteria.where("NAME").is(name));
         mongoTemplate.remove(query);

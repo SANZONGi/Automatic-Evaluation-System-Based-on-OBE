@@ -6,17 +6,24 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sanzong.obe.entity.Assignment;
 import com.sanzong.obe.entity.CurriculumObj;
+import com.sanzong.obe.entity.StudentModel;
 import com.sanzong.obe.entity.model.AssignmentToCurriculumObjModel;
 import com.sanzong.obe.mapper.AssignmentMapper;
 import com.sanzong.obe.mapper.CurriculumObjMapper;
+import com.sanzong.obe.service.IAssignmentToCurriculumObjService;
 import com.sanzong.obe.service.ICurriculumObjService;
+import com.sanzong.obe.service.IMongodbService;
 import javafx.util.Pair;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +35,7 @@ import java.util.stream.Collectors;
  * @since 2023-01-16
  */
 @Service
+@Slf4j
 public class CurriculumObjServiceImpl extends ServiceImpl<CurriculumObjMapper, CurriculumObj> implements ICurriculumObjService {
     @Autowired
     private CurriculumObjMapper curriculumObjMapper;
@@ -35,6 +43,14 @@ public class CurriculumObjServiceImpl extends ServiceImpl<CurriculumObjMapper, C
     @Autowired
     private AssignmentMapper assignmentMapper;
 
+    @Autowired
+    private IMongodbService mongodbService;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private IAssignmentToCurriculumObjService assignmentToCurriculumObjService;
 
     @Override
     public JSONArray getMatrix(int curriculumId) {
@@ -72,5 +88,131 @@ public class CurriculumObjServiceImpl extends ServiceImpl<CurriculumObjMapper, C
             jsonArray.add(temp);
         }
         return jsonArray;
+    }
+
+    @Override
+    public List<StudentModel> getCurriculumAchievement(int id) {
+        List<StudentModel> studentModels = updateCurriculumAchievement(id);
+        return studentModels;
+    }
+
+    public List<StudentModel> updateCurriculumAchievement(int id) {
+        List<StudentModel> studentModels = mongoTemplate.find(new Query(Criteria.where("curId").is(String.valueOf(id))), StudentModel.class);
+        Map<String, List<Pair<Integer, Integer>>> scores = new HashMap<>(100);
+        List<Integer> assignments = null;
+        List<CurriculumObj> curriculumObjs = null;
+        List<AssignmentToCurriculumObjModel> assignmentToCurriculumObjList = null;
+        Map<Integer, String> curriculumObjMap = new HashMap<>(100);
+        // 获取学生学业成绩
+        for (StudentModel studentModel : studentModels) {
+            List<JSONObject> detail = studentModel.getDetail().toList(JSONObject.class);
+            List<Pair<Integer, Integer>> scorePairList = detail
+                    .stream()
+                    .map(item -> new Pair<Integer, Integer>(getId(item.getString("assignment")), item.getInteger("score")))
+                    .sorted(new Comparator<Pair<Integer, Integer>>() {
+                        @Override
+                        public int compare(Pair<Integer, Integer> o1, Pair<Integer, Integer> o2) {
+                            return o2.getKey().compareTo(o1.getKey());
+                        }
+                    })
+                    .collect(Collectors.toList());
+            if (assignments == null) {
+                assignments = detail
+                        .stream()
+                        .map(item -> getId(item.getString("assignment")))
+                        .collect(Collectors.toList());
+            }
+            scores.put(studentModel.getName(), scorePairList);
+        }
+        if (assignments == null) {
+            log.error("assignments is null");
+            return null;
+        }
+        // 获取连接表数据
+        assignmentToCurriculumObjList = assignmentToCurriculumObjService.list(
+                new QueryWrapper<AssignmentToCurriculumObjModel>()
+                        .in("assignment_id", assignments)
+        );
+        // 获取课程目标
+        curriculumObjs = curriculumObjMapper.selectList(
+                new QueryWrapper<CurriculumObj>()
+                .eq("curriculum_id", id));
+
+        curriculumObjs.forEach(curriculumObj -> {
+                    curriculumObjMap.put(curriculumObj.getId(), curriculumObj.getCurriculumObj() + "(" + curriculumObj.getId() + ")");
+                });
+        // 整理链接表
+        Map<Integer, List<Pair<Integer, Integer> > > connectMatrix = new HashMap<>(1000);
+        for (AssignmentToCurriculumObjModel model : assignmentToCurriculumObjList) {
+            if (!connectMatrix.containsKey(model.getCurriculumObjId())) {
+                connectMatrix.put(model.getCurriculumObjId(),new ArrayList<>());
+            }
+            connectMatrix
+                    .get(model.getCurriculumObjId())
+                    .add(new Pair<>(model.getAssignmentId(), model.getWeight()));
+        }
+        studentModels.clear();
+        for (String stuName : scores.keySet()) {
+            JSONArray curObjAchievement = new JSONArray();
+            List<Pair<Integer,Integer>> scoreList = scores.get(stuName);
+            // 获取课程目标达成度
+            for (Integer key : connectMatrix.keySet()) {
+                List<Pair<Integer, Integer>> weights = connectMatrix.get(key).stream().sorted(new Comparator<Pair<Integer, Integer>>() {
+                    @Override
+                    public int compare(Pair<Integer, Integer> o1, Pair<Integer, Integer> o2) {
+                        return o2.getKey().compareTo(o1.getKey());
+                    }
+                }).collect(Collectors.toList());
+                // 双指针实现计算达成度
+                int curObjId = key;
+                int i = 0;
+                int j = 0;
+                double achievement = 0;
+                JSONObject item = new JSONObject();
+                while (i < scoreList.size() && j < weights.size()) {
+                    if (Objects.equals(scoreList.get(i).getKey(), weights.get(j).getKey())) {
+                        achievement += scoreList.get(i).getValue() * weights.get(j).getValue() / 100.0;
+                        i++;
+                        j++;
+                    } else if (scoreList.get(i).getKey() < weights.get(i).getKey()) {
+                        i++;
+                    }
+                    else {
+                        j++;
+                    }
+                }
+                item.put("curObj", curriculumObjMap.get(curObjId));
+                item.put("achievement", achievement);
+                curObjAchievement.add(item);
+            }
+            Query query = new Query(Criteria.where("NAME").is(stuName).and("curId").is(String.valueOf(id)));
+            Update update = new Update();
+            update.set("curObjAchievement", curObjAchievement);
+            FindAndModifyOptions findAndModifyOptions = new FindAndModifyOptions();
+            findAndModifyOptions.returnNew(true);
+            studentModels.add(mongoTemplate.findAndModify(
+                    query,
+                    update,
+                    findAndModifyOptions,
+                    StudentModel.class
+            ));
+        }
+        return studentModels;
+    }
+
+
+
+    private Integer getId(String origin) {
+        origin = origin.trim();
+        int pos = 0;
+        int id = 0;
+        for (int i = origin.length() - 2; i >= 0; i--) {
+            if (origin.charAt(i) == '(') {
+                break;
+            }
+            id += (origin.charAt(i) - '0') * Math.pow(10, pos++);
+
+        }
+        return id;
     }
 }
