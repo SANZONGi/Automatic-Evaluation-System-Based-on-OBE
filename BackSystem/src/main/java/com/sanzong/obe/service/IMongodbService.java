@@ -1,6 +1,7 @@
 package com.sanzong.obe.service;
 
 import com.sanzong.obe.entity.StudentModel;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.List;
 
@@ -19,6 +20,8 @@ public interface IMongodbService {
     void delStudentModel(String name);
 
     StudentModel updateStudentModel(String name, boolean isNew);
+
+    StudentModel updateStudentModelByColum(Integer id ,String name, boolean isNew, boolean upsert, Update update);
 
     boolean insertStudentModel(List<StudentModel> studentModels);
 }

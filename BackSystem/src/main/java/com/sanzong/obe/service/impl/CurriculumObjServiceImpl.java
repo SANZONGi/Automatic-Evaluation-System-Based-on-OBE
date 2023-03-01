@@ -16,7 +16,6 @@ import com.sanzong.obe.service.IMongodbService;
 import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -42,13 +41,10 @@ public class CurriculumObjServiceImpl extends ServiceImpl<CurriculumObjMapper, C
 
     @Autowired
     private AssignmentMapper assignmentMapper;
-
-    @Autowired
-    private IMongodbService mongodbService;
-
     @Autowired
     private MongoTemplate mongoTemplate;
-
+    @Autowired
+    private IMongodbService mongodbService;
     @Autowired
     private IAssignmentToCurriculumObjService assignmentToCurriculumObjService;
 
@@ -92,8 +88,7 @@ public class CurriculumObjServiceImpl extends ServiceImpl<CurriculumObjMapper, C
 
     @Override
     public List<StudentModel> getCurriculumAchievement(int id) {
-        List<StudentModel> studentModels = updateCurriculumAchievement(id);
-        return studentModels;
+        return updateCurriculumAchievement(id);
     }
 
     public List<StudentModel> updateCurriculumAchievement(int id) {
@@ -185,17 +180,9 @@ public class CurriculumObjServiceImpl extends ServiceImpl<CurriculumObjMapper, C
                 item.put("achievement", achievement);
                 curObjAchievement.add(item);
             }
-            Query query = new Query(Criteria.where("NAME").is(stuName).and("curId").is(String.valueOf(id)));
             Update update = new Update();
             update.set("curObjAchievement", curObjAchievement);
-            FindAndModifyOptions findAndModifyOptions = new FindAndModifyOptions();
-            findAndModifyOptions.returnNew(true);
-            studentModels.add(mongoTemplate.findAndModify(
-                    query,
-                    update,
-                    findAndModifyOptions,
-                    StudentModel.class
-            ));
+            studentModels.add(mongodbService.updateStudentModelByColum(id, stuName, true, false, update));
         }
         return studentModels;
     }

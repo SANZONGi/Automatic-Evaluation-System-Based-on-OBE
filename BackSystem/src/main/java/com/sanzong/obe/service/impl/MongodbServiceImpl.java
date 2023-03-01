@@ -46,6 +46,13 @@ public class MongodbServiceImpl implements IMongodbService {
     }
 
     @Override
+    public StudentModel updateStudentModelByColum(Integer id ,String name, boolean isNew, boolean upsert, Update update) {
+        Query query = new Query(Criteria.where("NAME").is(name).and("curId").is(String.valueOf(id)));
+        FindAndModifyOptions options = new FindAndModifyOptions().remove(false).returnNew(isNew).upsert(upsert);
+        return mongoTemplate.findAndModify(query, update, options,StudentModel.class);
+    }
+
+    @Override
     public boolean insertStudentModel(List<StudentModel> studentModels) {
         mongoTemplate.insertAll(studentModels);
         return false;
