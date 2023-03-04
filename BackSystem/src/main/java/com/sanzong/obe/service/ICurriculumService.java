@@ -1,7 +1,8 @@
 package com.sanzong.obe.service;
 
-import com.sanzong.obe.entity.Curriculum;
+import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.sanzong.obe.entity.Curriculum;
 
 /**
  * <p>
@@ -12,5 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2023-01-16
  */
 public interface ICurriculumService extends IService<Curriculum> {
-
+    JSONArray getStudentAchievementByCurriculum(String curId);
 }

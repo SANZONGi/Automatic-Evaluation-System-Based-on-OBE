@@ -37,9 +37,15 @@ public class CurriculumObjController {
         String obj = jsonObject.getStr("obj");
         String description = jsonObject.getStr("description");
         Integer curriculumId = jsonObject.getInt("curriculumId");
-        CurriculumObj curriculumObj = new CurriculumObj(id, obj, description, curriculumId);
+        Double weight = jsonObject.getDouble("weight");
+        CurriculumObj curriculumObj = new CurriculumObj(id, obj, description, curriculumId, weight);
         curriculumObjService.saveOrUpdate(curriculumObj);
         return new ResponseBody("success", 1, null);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseBody getCurriculumObj(@PathVariable String id) {
+        return new ResponseBody("success", curriculumObjService.getById(id));
     }
 
     @GetMapping("/list/{curriculumId}")

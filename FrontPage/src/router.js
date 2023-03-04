@@ -20,6 +20,9 @@ const SubdivisionEdit = () => import('./views/SubdivisionEdit')
 const CurriculumList = () => import('./views/CurriculumList')
 const CurriculumListEdit = () => import('./views/CurriculumListEdit')
 const Curriculum = () => import('./views/Curriculum')
+const SubdivisionCurObjMatrix = () => import('./views/SubdivisionCurriculumMatrix.vue')
+const CurriculumObjEdit = () => import('./views/CurriculumObjEdit.vue')
+const AssignmentEdit = () => import('./views/AssignmentEdit.vue')
 
 
 
@@ -146,6 +149,30 @@ export default new VueRouter({
             name: 'ChangePwd',
             component: ChangePwd,
             meta: {
+                requireAuth: true
+            }
+        },
+        {
+            path: '/SubdivisionCurObjMatrix',
+            name: 'SubdivisionCurObjMatrix',
+            component: SubdivisionCurObjMatrix,
+            mate: {
+                requireAuth: true
+            }
+        },
+        {
+            path: '/CurriculumObjEdit',
+            name: 'CurriculumObjEdit',
+            component: CurriculumObjEdit,
+            mate: {
+                requireAuth: true
+            }
+        },
+        {
+            path: '/AssignmentEdit',
+            name: 'AssignmentEdit',
+            component: AssignmentEdit,
+            mate: {
                 requireAuth: true
             }
         }

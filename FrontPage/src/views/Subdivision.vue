@@ -157,8 +157,8 @@ export default {
       })
     },
     querySearch(queryString, cb) {
-      let restaurants = this.fatherList;
-      let results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
+      let list = this.matrix;
+      let results = queryString ? list.filter(this.createFilter(queryString)) : list;
       // 调用 callback 返回建议列表的数据
       cb(results);
     },

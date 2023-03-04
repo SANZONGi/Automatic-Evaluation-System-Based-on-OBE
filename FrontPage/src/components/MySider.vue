@@ -17,7 +17,7 @@
       </template>
       <MenuItem name="2-1" to="GradReqment">毕业要求管理</MenuItem>
       <MenuItem name="2-2" to="Subdivision">毕业要求细分点管理</MenuItem>
-      <MenuItem name="2-3">毕业要求-培养目标矩阵</MenuItem>
+      <MenuItem name="2-3" to="SubdivisionCurObjMatrix">毕业要求细分点-培养目标矩阵</MenuItem>
     </Submenu>
     <Submenu name="3">
       <template #title>

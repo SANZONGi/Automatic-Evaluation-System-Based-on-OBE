@@ -2,16 +2,13 @@ package com.sanzong.obe.controller;
 
 
 import cn.hutool.json.JSONObject;
-import com.sanzong.obe.entity.GraduationRequirement;
 import com.sanzong.obe.entity.SubdivisionPoint;
 import com.sanzong.obe.service.impl.GraduationRequirementServiceImpl;
 import com.sanzong.obe.service.impl.SubdivisionPointServiceImpl;
 import com.sanzong.obe.utils.ResponseBody;
-import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.spring.web.json.Json;
 
 import java.util.List;
 
@@ -59,5 +56,10 @@ public class SubdivisionPointController{
     public ResponseBody deleteRequirement(@PathVariable Integer id) {
         subdivisionPointService.removeById(id);
         return new ResponseBody("success", 1, null);
+    }
+
+    @GetMapping("/matrix/{gradReqId}")
+    public ResponseBody getMatrixByGraduationRequirementId(@PathVariable String gradReqId) {
+        return new ResponseBody("success", subdivisionPointService.getMatrix(gradReqId));
     }
 }

@@ -103,4 +103,10 @@ public class CurriculumController {
         List<StudentModel> studentModels = mongoTemplate.find(qurey, StudentModel.class);
         return new ResponseBody("success", studentModels);
     }
+
+    @GetMapping("/achievement/{curId}")
+    public ResponseBody getStudentAchievementByCurriculum(@PathVariable String curId) {
+        //TODO
+        return new ResponseBody("success", curriculumService);
+    }
 }

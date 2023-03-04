@@ -32,8 +32,8 @@
             </el-row>
 
             <template>
-              <Tabs type="card" style="margin-top: 20px" v-model="modelValue" :value="modelValue"
-                    @on-tab-remove="handleTabRemove">
+              <Tabs type="card" style="margin-top: 20px;" v-model="modelValue" :value="modelValue"
+                    @on-tab-remove="handleTabRemove" >
                 <TabPane label="课程大纲">
                   <!--                  v-model禁止使用this-->
                   <Input v-model="originCurriculum.outline" type="textarea" :autosize="{minRows: 4}"
@@ -43,7 +43,7 @@
                 </TabPane>
                 <TabPane label="课程任务" name="tAssignment">
                   <el-row>
-                    <el-button style="float: right" @click="()=>{this.assignmentAdd=true;modelValue='assignmentAdd'}">
+                    <el-button style="float: right" @click="$router.push('AssignmentEdit')">
                       新增任务
                     </el-button>
                   </el-row>
@@ -65,7 +65,7 @@
                         width="50px"
                         :show-overflow-tooltip="true">
                       <template slot-scope="scope">
-                        <el-button @click="Adetails(scope.row)" type="text" size="small">详情</el-button>
+                        <el-button @click="Adetails(scope.row.id)" type="text" size="small">详情</el-button>
                       </template>
                     </el-table-column>
                   </el-table>
@@ -78,7 +78,7 @@
                 </TabPane>
                 <TabPane label="课程目标" name="tObj">
                   <el-row>
-                    <el-button style="float: right" @click="()=>{this.objAdd=true;modelValue='objAdd'}">新增目标
+                    <el-button style="float: right" @click="$router.push('curriculumObjEdit')">新增目标
                     </el-button>
                   </el-row>
                   <el-table
@@ -104,54 +104,10 @@
                         width="50px"
                         :show-overflow-tooltip="true">
                       <template slot-scope="scope">
-                        <el-button @click="details(scope.row)" type="text" size="small">详情</el-button>
+                        <el-button @click="details(scope.row.id)" type="text" size="small">详情</el-button>
                       </template>
                     </el-table-column>
                   </el-table>
-                </TabPane>
-                <TabPane v-if="objAdd" label="课程目标新增" name="objAdd" closable="true">
-                  <Form ref="curriculumObj" :model="curriculumObj" label-position="top">
-                    <FormItem label="课程目标">
-                      <Input v-model="curriculumObj.obj"/>
-                    </FormItem>
-                    <FormItem label="课程目标描述">
-                      <Input v-model="curriculumObj.description"/>
-                    </FormItem>
-                  </Form>
-                  <Button type="primary" @click="handleSubmit()">Submit</Button>
-                </TabPane>
-                <TabPane v-if="assignmentAdd" label="课程任务新增" name="assignmentAdd" closable="true">
-                  <Form ref="curriculumObj" :model="assignmentDetail" label-position="top">
-                    <FormItem label="课程任务">
-                      <Input v-model="assignment.name"/>
-                    </FormItem>
-                  </Form>
-                  <Button type="primary" @click="handleSubmitAssignment()">Submit</Button>
-                </TabPane>
-                <TabPane v-if="objDetails" label="课程目标详情" name="objDetails" closable="true">
-                  <Form :model="curriculumObj" label-position="top">
-                    <FormItem label="课程目标 ID">
-                      <Input v-model="curriculumObjDetail.id" disabled="disabled"/>
-                    </FormItem>
-                    <FormItem label="课程目标">
-                      <Input v-model="curriculumObjDetail.curriculumObj"/>
-                    </FormItem>
-                    <FormItem label="课程目标描述">
-                      <Input v-model="curriculumObjDetail.description"/>
-                    </FormItem>
-                  </Form>
-                  <Button type="primary" @click="handleChange()">Submit</Button>
-                </TabPane>
-                <TabPane v-if="assignmentDetails" label="课程任务详情" name="assignmentDetails" closable="true">
-                  <Form :model="curriculumObj" label-position="top">
-                    <FormItem label="课程任务 ID">
-                      <Input v-model="assignmentDetail.id" disabled="true"/>
-                    </FormItem>
-                    <FormItem label="课程任务">
-                      <Input v-model="assignmentDetail.name"/>
-                    </FormItem>
-                  </Form>
-                  <Button type="primary" @click="handleChangeAssignment()">Submit</Button>
                 </TabPane>
                 <TabPane label="课程目标支撑矩阵" name="martix">
                   <el-table :data="matrix" style="width: 100%" border :summary-method="getSummaries" show-summary
@@ -214,8 +170,27 @@
                     </el-table-column>
                   </el-table>
                 </TabPane>
+                <TabPane label="课程达成度" name="curAchievement">
+                  <el-table
+                      :data="curriculumAchievementData"
+                      max-height="550px"
+                      style="width: 100%;">
+                    <el-table-column
+                        label="学号"
+                        prop="id">
+                    </el-table-column>
+                    <el-table-column
+                        label="姓名"
+                        prop="name">
+                    </el-table-column>
+                    <el-table-column
+                        label="达成度"
+                        prop="achievement"
+                    >
+                    </el-table-column>
+                  </el-table>
+                </TabPane>
               </Tabs>
-
             </template>
           </Content>
         </Layout>
@@ -228,12 +203,15 @@
 <script>
 import MyHeader from '@/components/MyHeader'
 import MySider from '@/components/MySider'
+import router from "@/router";
 
 export default {
   inject: ['reload'],
   components: {MyHeader, MySider},
   data() {
     return {
+      curriculumAchievementData: [],
+      calculate: '',
       achievementMatrix: [{
         name: '',
         curObjAchievement: [{
@@ -275,10 +253,6 @@ export default {
       }],
       modelValue: "",
       originCurriculum: {},
-      objDetails: false,
-      objAdd: false,
-      assignmentDetails: false,
-      assignmentAdd: false,
       editable: false,
       editable2: false,
       tableData: [
@@ -296,19 +270,7 @@ export default {
         curriculumObj: '',
         description: ''
       }],
-      curriculumObj: {
-        id: '',
-        obj: '',
-        description: '',
-        curriculumId: ''
-      },
-      curriculumObjDetail: {},
       assignment: {
-        id: '',
-        name: '',
-        curriculumId: ''
-      },
-      assignmentDetail: {
         id: '',
         name: '',
         curriculumId: ''
@@ -331,7 +293,7 @@ export default {
       this.originCurriculum = JSON.parse(localStorage.getItem("editingCur"))
     }
     if (this.originCurriculum === null) this.$router.push("CurriculumList")
-
+    // 课程目标
     this.$axios.get("/obe/cur_obj/list/" + this.originCurriculum.id).then(res => {
       if (res.data.status === "success") {
         this.curriculumData = res.data.data
@@ -342,21 +304,29 @@ export default {
         });
       }
     })
+    // 课程任务
     this.$axios.get("/obe/cur/assignment/list/" + this.originCurriculum.id).then(res => {
       this.assignmentData = res.data.data
     })
+    // 支撑矩阵
     this.$axios.get("/obe/cur_obj/matrix/" + this.originCurriculum.id).then(res => {
       this.matrix = res.data.data
     })
+    // 学生分数
     this.$axios.get("/obe/cur/score/" + this.originCurriculum.id).then(res => {
       this.studentModel = res.data.data
     })
+    // 课程目标达成度
     this.$axios.get("/obe/cur_obj/matrix/achievement/" + this.originCurriculum.id).then(res=>{
       this.achievementMatrix = res.data.data
     })
+
     this.modelValue = localStorage.getItem("actived_cur_tabpane")
   },
   methods: {
+    router() {
+      return router
+    },
     handleFileChange(file) {
       this.fileTemp = file.raw;
       let form = new FormData
@@ -390,7 +360,6 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
     handleRemove() {
-      // console.log(file)
       this.fileTemp = null;
     },
     handleExceed(files, fileList) {
@@ -442,65 +411,12 @@ export default {
       this.modelValue = "tObj"
     }
     ,
-    handleSubmitAssignment() {
-      this.assignment.curriculumId = this.originCurriculum.id
-      this.$axios({
-        method: "post",
-        url: "/obe/cur/assignment/edit",
-        data: this.assignment,
-      }).then(res => {
-        if (res.data.data === 1) {
-          this.$Message['success']({
-            background: true,
-            content: '添加成功'
-          });
-        }
-      })
-      this.modelValue = "tAssignment"
+    details(id) {
+      this.$router.push({path: '/CurriculumObjEdit', query: {id : id }})
     }
     ,
-    handleChange() {
-      this.$axios({
-        method: "post",
-        url: "/obe/cur_obj/edit",
-        data: this.curriculumObjDetail,
-      }).then(res => {
-        if (res.data.data === 1) {
-          this.$Message['success']({
-            background: true,
-            content: '修改成功'
-          });
-        }
-      })
-      this.objDetails = false
-    }
-    ,
-    handleChangeAssignment() {
-      this.$axios({
-        method: "post",
-        url: "/obe/cur/assignment/edit",
-        data: this.assignmentDetail,
-      }).then(res => {
-        if (res.data.data === 1) {
-          this.$Message['success']({
-            background: true,
-            content: '修改成功'
-          });
-        }
-      })
-      this.assignmentDetails = false
-    }
-    ,
-    details(curriculumObjDetail) {
-      this.objDetails = true
-      this.curriculumObjDetail = curriculumObjDetail
-      this.modelValue = 'objDetails';
-    }
-    ,
-    Adetails(assignmentDetail) {
-      this.assignmentDetails = true
-      this.assignmentDetail = assignmentDetail
-      this.modelValue = 'assignmentDetails';
+    Adetails(id) {
+      this.$router.push({path: '/AssignmentEdit', query: {id : id }})
     }
     ,
     getSummaries() {
